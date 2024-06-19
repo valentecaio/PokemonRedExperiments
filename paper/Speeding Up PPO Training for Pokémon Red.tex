@@ -311,7 +311,7 @@
 
 \else
   % \author{Caio Valente}
-  \author{\IEEEauthorblockN{Caio Valente\\\href{https://github.com/valentecaio}{github.com/valentecaio}\\12th June 2024}}
+  \author{\IEEEauthorblockN{Caio Valente\\\href{https://github.com/valentecaio/PokemonRedExperiments}{github.com/valentecaio/PokemonRedExperiments}\\12th June 2024}}
   \linenumbers
 \fi
 
@@ -354,7 +354,7 @@ Subsequent advancements have built upon the DQN framework, addressing limitation
 
 While significant progress has been made in mastering simpler games like Atari, more complex games such as Pokémon Red, an RPG game, still require further exploration. These games present a greater challenge due to their non-repetitive gameplay. The agent must navigate a narrative, handle recurrent events with straightforward dynamics like battles, and explore the map to advance the plot of the game. This complexity requires sophisticated learning strategies capable of dealing with both the game's strategic and exploratory aspects.
 
-More recently, Peter Whidden proposed a PPO trained agent capable of beating the first gymnasium of Pokemon Red \cite{ref:whidden}. His original algorithm focuses on training an agent to play Pokémon Red using the algorithm within a custom Gym \cite{ref:gymnasium} environment. The primary objective is to maximize the agent's performance by rewarding various in-game achievements and penalizing setbacks, facilitating the agent's ability to explore, battle, and progress through the game effectively. The PPO model should maximize the total reward of the player for any action in any given state.
+More recently, Peter Whidden proposed a PPO trained agent capable of beating the first gymnasium of Pokemon Red \cite{ref:whidden}. His original algorithm focuses on training an agent to play Pokémon Red using the algorithm within a custom Gym environment \cite{ref:gymnasium}. The primary objective is to maximize the agent's performance by rewarding various in-game achievements and penalizing setbacks, facilitating the agent's ability to explore, battle, and progress through the game effectively. The PPO model should maximize the total reward of the player for any action in any given state.
 
 Whidden released his training code and a pretrained agent obtained through 439 million training steps, establishing it as the current state-of-the-art for this particular game. This extensive training process allowed the agent to develop strategies for exploring the game world, engaging in battles, and advancing through the storyline. However, the agent is not optimal - while it can successfully navigate up to and pass the first gym, it encounters difficulties and often gets stuck beyond that point. This limitation highlights the ongoing challenges and potential areas for improvement in developing reinforcement learning agents for complex RPG games like Pokémon Red.
 
@@ -374,7 +374,7 @@ To achieve such, I used the same base algorithm as Whidden and experimented with
 
 The batch size refers to the number of training examples used in one iteration to update the model's parameters. A larger batch size typically provides a more stable estimate of the gradient, leading to smoother and potentially faster convergence, but requires more memory and computational resources. A smaller batch size may introduce more noise into the gradient estimation, which can sometimes help the model escape local minima but often results in less stable training.
 
-The original implementation used the stable\_baselines3 library \cite{ref:stable-baselines3}, which lacked support for non-constant batch sizes. This work extended this library to include dynamic batch sizing and applied it in my experiments. The maximum batch size I was able to test was limited by my GPU memory (RTX 4050, 6G).
+The original implementation used the stable\_baselines3 library \cite{ref:stable-baselines3}, which lacked support for non-constant batch sizes. I extended the library to include dynamic batch sizing and applied it in my experiments. The maximum batch size I was able to test was limited by my GPU memory (RTX 4050, 6G).
 
 The learning rate determines the step size at each iteration while moving towards a minimum of the loss function. A higher learning rate allows the model to converge faster but risks overshooting the minimum, leading to divergence or oscillation. A lower learning rate provides more precise adjustments to the model parameters, which can result in more stable convergence but at the cost of longer training times. Dynamic learning rates adjust over time to balance these trade-offs, often starting high to speed up initial training and decreasing to refine the model's performance.
 
@@ -382,7 +382,7 @@ The entropy coefficient controls the entropy bonus added to the reward function,
 
 The weight decay is a hyperparameter of the AdamW optimizer. It is a regularization technique that helps prevent overfitting by penalizing large weights. This penalty term is added to the loss function, encouraging the model to keep the weights smaller and more generalized. In contrast to traditional L2 regularization, which directly modifies the gradients, AdamW decouples weight decay from the gradient updates, leading to more effective regularization. Applying weight decay can improve generalization by preventing the model from fitting noise in the training data. However, if set too high, it may hinder the model's ability to learn complex patterns in the data, resulting in underfitting.
 
-In this work, I tried six variations of hyperparameters in the original PPO algorithm and compared their performance to the original retrained model.
+In this research, I tried six variations of hyperparameters in the original PPO algorithm and compared their performance to the original retrained model.
 
 
 
@@ -397,7 +397,7 @@ In this work, I tried six variations of hyperparameters in the original PPO algo
 
 \subsection{Training Procedure}
 
-The training process involves alternating between emulating the game and updating the network. Emulation is performed on the CPU, with one emulator running per core in parallel. Each training step represents some frames being emulated. In each step, the player does an action (a button press and release) from the available actions in his action space, which are: Button A, Button B, Up, Down, Left or Right. 
+The training process involves alternating between emulating the game and updating the network. Emulation is performed on the CPU, with one emulator running per core in parallel. Each training step represents some frames being emulated. In each step, the player does an action (i.e: presses and releases a button) from the available actions in his action space, which contains the buttons: A, B, Up, Down, Left and Right. 
 
 An episode of the game is a fixed number of steps that is considered as a round of the game. After the episode is over, the game is reset to the initial state and the training continues with the new trained network. 
 
@@ -414,7 +414,7 @@ To be able to fit the model in memory and train it in reasonable time, the episo
 \subsection{Algorithm Configuration}
 The same CNN policy from the original work was used \ref{fig:cnn}. It consists of a single network shared between the value and policy functions, and employs a simple convolutional neural network (CNN) architecture inspired by the original Deep Q-Network (DQN) paper by Mnih et al. (2015) \cite{ref:dqn}. This CNN consists of three convolutional layers followed by activation functions (ReLU), a flattening layer, and a single fully connected layer. 
 
-The State input of the network is an image containing the last three frames of the game downscaled and concatenated to a pre-processed health points (HP) bar, facilitating short-term memory and enhancing HP-related rewards. The optimizer used for training is the Adam optimizer with default parameters, excluding weight decay. 
+The State input of the network is an image containing the last three frames of the game downscaled and concatenated to a pre-processed health points (HP) bar, facilitating short-term memory and enhancing HP-related rewards. The Adam optimizer with default parameters (without weight decay) was used for training. 
 
 The original proposed network used the following constant hyperparameters:
 
@@ -443,7 +443,7 @@ The same reward calculation proposed originally was used, based on several metri
   \item Healing reward: Rewards for the healing actions performed, proportional to the amount of HP restored. This should motivate the agent to use healing items and to visit Pokemon centers, which is important since they work as checkpoints when the player loses a battle.
   \item Maximum opponent level reward: Rewards for defeating high-level opponents. As the level of the opponents increase throughout the game, this should motivate the agent to follow the storyline.
   \item Gym badges reward: Rewards for earning gym badges. Should motivate the agent to progress through the game.
-  \item Exploration reward: The most important reward, based on the number of unique frames the player has explored. It should directly impact the exploration of the map. The algorithm uses a KNN algorithm to compare the current screen's pixels to a list of previously seen screens. If the screen is new, it is added to the list, encouraging the agent to explore new areas of the game.
+  \item Exploration reward: The most important reward, based on the number of unique frames the player has explored. It should directly impact the exploration of the map. The algorithm uses a K-Nearest Neighbors (KNN) algorithm to compare the current screen's pixels to a list of previously seen screens. New screens are detected and added to the list, increasing the reward and encouraging the agent to explore new areas of the game.
   \item Dying penalty: Penalties (negative rewards) are applied when the player loses a battle, causing a reset to the last visited Pokémon Center. This is particularly important since the player can be sent far back in the game after losing a battle.
 \end{itemize}
 
@@ -560,7 +560,7 @@ Code: \url{https://github.com/PWhiddy/PokemonRedExperiments}.
 \bibitem{ref:dqn}
 Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Andrei A Rusu, Joel Veness, Marc G Bellemare,
 Alex Graves, Martin Riedmiller, Andreas K Fidjeland, Georg Ostrovski, et al. 
-Human-level control through deep reinforcement learning. \href{www.nature.com/articles/nature14236}{Nature, 518(7540):529–533} (2015).
+Human-level control through deep reinforcement learning. \href{https://www.nature.com/articles/nature14236}{Nature, 518(7540):529–533} (2015).
 
 \bibitem{ref:ale}
 Bellemare, M. G., Naddaf, Y., Veness, J. \& Bowling, M.
