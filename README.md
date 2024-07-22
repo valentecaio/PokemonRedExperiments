@@ -30,7 +30,8 @@ After some time playing:
 ---
 
 ### Pokémon Red ROM
-You need to have a legally obtained Pokémon Red ROM to run or train the models. The ROM should be placed in the `game/` directory and named `PokemonRed.gb`. The SHA1 sum of the ROM should be `ea9bcae617fdf159b045185467ae58b2e4a48b9a`, which you can verify by running `shasum PokemonRed.gb`. 
+You need to have a legally obtained Pokémon Red ROM to run or train the models. It should be placed in the `game/PokemonRed.gb`.  
+The SHA1 sum of the ROM should be `ea9bcae617fdf159b045185467ae58b2e4a48b9a`, which you can verify by running `shasum game/PokemonRed.gb`. 
 
 ---
 
